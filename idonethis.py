@@ -31,6 +31,8 @@ STRIP_QUOTES = True
 HEADER_FOR_DAYONE_ENTRIES = 'iDoneThis entry'
 
 
+# Note the strange lack of indentation on the {entry_text} b/c day one will
+# display special formatting to text that is indented, which we want to avoid.
 ENTRY_TEMPLATE = """
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
@@ -39,9 +41,17 @@ ENTRY_TEMPLATE = """
     <key>Creation Date</key>
     <date>{date}</date>
     <key>Entry Text</key>
-    <string><![CDATA[{entry_text}]]></string>
+    <string> {entry_title}
+        <![CDATA[
+{entry_text}
+        ]]>#idonethis
+    </string>
     <key>Starred</key>
     <false/>
+    <key>Tags</key>
+    <array>
+        <string>idonethis</string>
+    </array>
     <key>UUID</key>
     <string>{uuid_str}</string>
 </dict>
@@ -101,9 +111,7 @@ def _convert_to_dayone_date_string(date):
 def _create_dayone_entry(date, entries, directory, verbose):
     """Create single dayone journal entry for list of given entries"""
 
-    entries.insert(0, HEADER_FOR_DAYONE_ENTRIES)
     entry_text = '\n'.join(entries)
-
     date = _convert_to_dayone_date_string(date)
 
     # Create unique uuid without any specific machine information (uuid() vs.
@@ -114,7 +122,8 @@ def _create_dayone_entry(date, entries, directory, verbose):
     full_file_name = os.path.join(directory, file_name)
 
     with open(full_file_name, 'w') as file_obj:
-        text = ENTRY_TEMPLATE.format(date=date,
+        text = ENTRY_TEMPLATE.format(entry_title=HEADER_FOR_DAYONE_ENTRIES,
+                                     date=date,
                                      entry_text=entry_text,
                                      uuid_str=uuid_str)
         file_obj.write(text)
