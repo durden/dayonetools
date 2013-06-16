@@ -18,7 +18,6 @@ import argparse
 from datetime import datetime
 import os
 import re
-import sys
 import uuid
 
 DAYONE_ENTRIES = '/Users/durden/Dropbox/Apps/Day One/Journal.dayone/entries/'
