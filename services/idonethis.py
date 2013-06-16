@@ -12,6 +12,17 @@ This can be done by performing the following:
 
 This will save the CSV file which you can use directly as an argument to this
 script.
+
+You then will want to edit DAYONE_ENTRIES and possibly
+HEADER_FOR_DAYONE_ENTRIES to match your data file and preferences.
+
+There is also a '-t' option that will process your CSV file and put the results
+in a 'test/' directory for inspection.  This is recommended before running this
+application on your full Day One directory.
+
+You can find all your imported idonethis entries after pushing the Day One by
+searching in Day One for the #idonethis tag.  All imported entries will have
+this tag.
 """
 
 import argparse
