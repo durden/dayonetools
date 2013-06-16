@@ -94,7 +94,7 @@ def _convert_to_dayone_date_string(date):
     now = datetime.utcnow()
 
     # Dayone doesn't read entries correctly when date has a ms component
-    ms=0
+    ms = 0
 
     date = now.replace(year=int(year),
                        month=int(month),
