@@ -98,7 +98,7 @@ def _convert_to_dayone_date_string(date):
     return iso_string + 'Z'
 
 
-def _create_dayone_entry(date, entries, create_test_entry, verbose):
+def _create_dayone_entry(date, entries, directory, verbose):
     """Create single dayone journal entry for list of given entries"""
 
     entries.insert(0, HEADER_FOR_DAYONE_ENTRIES)
@@ -111,11 +111,7 @@ def _create_dayone_entry(date, entries, create_test_entry, verbose):
     uuid_str = re.sub('-', '', str(uuid.uuid4()))
 
     file_name = '%s.doentry' % (uuid_str)
-
-    if create_test_entry:
-        full_file_name = os.path.join('.', file_name)
-    else:
-        full_file_name = os.path.join(DAYONE_ENTRIES, file_name)
+    full_file_name = os.path.join(directory, file_name)
 
     with open(full_file_name, 'w') as file_obj:
         text = ENTRY_TEMPLATE.format(date=date,
@@ -149,6 +145,15 @@ def main():
 
     date_re = re.compile('^\d{4}-\d{2}-\d{2}$')
 
+    if args['test']:
+        directory = './test'
+        try:
+            os.mkdir(directory)
+        except OSError as err:
+            print 'Warning: %s' % (err)
+    else:
+        directory = DAYONE_ENTRIES
+
     with open(args['input_file'], 'r') as file_obj:
         current_day_entries = []
         curr_date = None
@@ -178,7 +183,7 @@ def main():
                 current_day_entries.append(entry_text)
             else:
                 _create_dayone_entry(curr_date, current_day_entries,
-                                     args['test'], args['verbose'])
+                                     directory, args['verbose'])
                 current_day_entries = [entry_text]
                 curr_date = new_date
 
