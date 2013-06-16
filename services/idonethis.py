@@ -26,6 +26,7 @@ this tag.
 """
 
 import argparse
+import csv
 from datetime import datetime
 import os
 import re
@@ -53,9 +54,9 @@ ENTRY_TEMPLATE = """
     <date>{date}</date>
     <key>Entry Text</key>
     <string> {entry_title}
-        <![CDATA[
-{entry_text}
-        ]]>#idonethis
+<![CDATA[
+{entry_text}]]>
+#idonethis
     </string>
     <key>Starred</key>
     <false/>
@@ -178,14 +179,12 @@ def main():
         current_day_entries = []
         curr_date = None
 
-        for line in file_obj:
-            csvs = line.split(',')
-
+        for row in csv.reader(file_obj):
             # If line doesn't start with a date assume it's just another line
             # in the current entry we are accumulating.
-            new_date = csvs[0]
+            new_date = row[0]
             if not date_re.match(new_date):
-                entry_text = _sanitize_entry_text(csvs[1:], STRIP_QUOTES)
+                entry_text = _sanitize_entry_text(row[1:], STRIP_QUOTES)
 
                 if not current_day_entries:
                     raise IndexError(
@@ -194,7 +193,7 @@ def main():
                 current_day_entries.append(entry_text)
                 continue
 
-            entry_text = _sanitize_entry_text(csvs[1:], STRIP_QUOTES)
+            entry_text = _sanitize_entry_text(row[1:], STRIP_QUOTES)
 
             if curr_date is None:
                 curr_date = new_date
