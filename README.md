@@ -23,8 +23,8 @@ setup to export data, etc.
 ### Supported services
 
 - [iDoneThis.com](http://idonethis.com)
+- [nike fuel](http://nikeplus.nike.com/)
 - [habit list](http://habitlist.com/) (coming soon)
-- [nike fuel](http://nikeplus.nike.com/) (coming soon)
 - [sleep cycle](http://sleepcycle.com/) (coming soon)
 
 ### Differences to Slogger
@@ -39,7 +39,7 @@ ways.
    that have a web API.
 3. [slogger](https://github.com/ttscoff/Slogger) is written in Ruby.
 
-The Day One tools collection of scripts is meant to fill this gap regarding
+The Day One tools collection of scripts is meant to fill the gap regarding
 unsupported services in Slogger.  In addition, it's a different mindset in that
 these scripts could be automated but the services they import from are lesser
 used and possibly more difficult to export data from.
