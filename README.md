@@ -24,7 +24,7 @@ setup to export data, etc.
 
 - [iDoneThis.com](http://idonethis.com)
 - [nike fuel](http://nikeplus.nike.com/)
-- [habit list](http://habitlist.com/) (coming soon)
+- [habit list](http://habitlist.com/)
 - [sleep cycle](http://sleepcycle.com/) (coming soon)
 
 ### Differences to Slogger
