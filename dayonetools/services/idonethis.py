@@ -32,6 +32,8 @@ import os
 import re
 import uuid
 
+from dayonetools.services import convert_to_dayone_date_string
+
 DAYONE_ENTRIES = '/Users/durden/Dropbox/Apps/Day One/Journal.dayone/entries/'
 
 # Depending on where you entered your iDoneThis entry the text might be wrapped
@@ -93,38 +95,11 @@ def _parse_args():
     return vars(parser.parse_args())
 
 
-def _convert_to_dayone_date_string(date):
-    """
-    Convert given date in 'yyyy-mm-dd' format into dayone accepted format of
-    iso8601
-
-    The timestamp will match the current time but year, month, and day will
-    be replaced with given arguments.
-    """
-
-    year, month, day = date.split('-')
-    now = datetime.utcnow()
-
-    # Dayone doesn't read entries correctly when date has a ms component
-    ms = 0
-
-    date = now.replace(year=int(year),
-                       month=int(month),
-                       day=int(day),
-                       microsecond=ms)
-
-    iso_string = date.isoformat()
-
-    # Very specific format for dayone, if the 'Z' is not in the
-    # correct positions the entries will not show up in dayone at all.
-    return iso_string + 'Z'
-
-
 def _create_dayone_entry(date, entries, directory, verbose):
     """Create single dayone journal entry for list of given entries"""
 
     entry_text = '\n'.join(entries)
-    date = _convert_to_dayone_date_string(date)
+    date = convert_to_dayone_date_string(date)
 
     # Create unique uuid without any specific machine information (uuid() vs.
     # uuid()) and strip any '-' characters to be consistent with dayone format.

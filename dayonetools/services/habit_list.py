@@ -43,6 +43,8 @@ import os
 import re
 import uuid
 
+from dayonetools.services import convert_to_dayone_date_string
+
 DAYONE_ENTRIES = '/Users/durden/Dropbox/Apps/Day One/Journal.dayone/entries/'
 
 # This text will be inserted into the first line of all entries created, set to
@@ -100,34 +102,6 @@ def _parse_args():
     return vars(parser.parse_args())
 
 
-# FIXME: Copied between idonethis and habit_list
-def _convert_to_dayone_date_string(date):
-    """
-    Convert given date in 'yyyy-mm-dd' format into dayone accepted format of
-    iso8601
-
-    The timestamp will match the current time but year, month, and day will
-    be replaced with given arguments.
-    """
-
-    year, month, day = date.split('-')
-    now = datetime.utcnow()
-
-    # Dayone doesn't read entries correctly when date has a ms component
-    ms = 0
-
-    date = now.replace(year=int(year),
-                       month=int(month),
-                       day=int(day),
-                       microsecond=ms)
-
-    iso_string = date.isoformat()
-
-    # Very specific format for dayone, if the 'Z' is not in the
-    # correct positions the entries will not show up in dayone at all.
-    return iso_string + 'Z'
-
-
 def _habits_to_markdown(habits):
     """Create markdown list of habits"""
 
@@ -152,7 +126,7 @@ def _create_habitlist_entry(directory, date, habits, verbose):
     file_name = '%s.doentry' % (uuid_str)
     full_file_name = os.path.join(directory, file_name)
 
-    date = _convert_to_dayone_date_string(date)
+    date = convert_to_dayone_date_string(date)
     habits = _habits_to_markdown(habits)
 
     entry = {'entry_title': HEADER_FOR_DAYONE_ENTRIES,
