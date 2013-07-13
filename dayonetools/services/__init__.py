@@ -1,16 +1,15 @@
 """Common services code"""
 
-
-from datetime import datetime
-import importlib
-
 AVAILABLE_SERVICES = ['habit_list', 'idonethis', 'nikeplus']
-SERVICES_PKG = 'dayonetools.services'
+
 
 def get_service_module(service_name):
     """Import given service from dayonetools.services package"""
 
-    module = '%s.%s' % (SERVICES_PKG, service_name)
+    import importlib
+    services_pkg = 'dayonetools.services'
+
+    module = '%s.%s' % (services_pkg, service_name)
     return importlib.import_module(module)
 
 
@@ -24,6 +23,8 @@ def convert_to_dayone_date_string(date):
     """
 
     year, month, day = date.split('-')
+
+    from datetime import datetime
     now = datetime.utcnow()
 
     # Dayone doesn't read entries correctly when date has a ms component
