@@ -7,12 +7,6 @@ habits, Internet usage, goals, etc. into it as possible.  Luckily, the format
 for Day One is simply XML in the form of OS X plists.  This makes it very easy
 to import data into.
 
-## Running scripts
-
-Each script supports a single service.  The documentation, etc. for the script
-should be available by running any of the scripts individually with the `-h`
-parameter.
-
 ## Goals
 
 This repository aims to be a single place for one-shot scripts to semi-automate
@@ -20,12 +14,35 @@ exporting various data into the Day One XML format.  The purpose is to
 primarily support services without a web API and those that involve more manual
 setup to export data, etc.
 
+## Install
+
+- Install package with the standard `pip` workflow:
+    - git clone repositiory
+    - cd into repository
+    - pip install .
+
+Now you should have a top-level script called `dayonetools` to interact with
+all the individual services, etc.
+
+- Run `dayonetools -h` to ensure the install worked properly.
+
+## Usage
+
+- Run `dayonetools -h` for help
+- Run `dayonetools <service_name> -h` for help on an individual service
+    - For example: `dayonetools idonethis -h`
+
 ### Supported services
 
 - [iDoneThis.com](http://idonethis.com)
 - [nike fuel](http://nikeplus.nike.com/)
 - [habit list](http://habitlist.com/)
 - [sleep cycle](http://sleepcycle.com/) (coming soon)
+- [Timing](http://timingapp.com/) (coming soon)
+
+### How to contribute
+
+See CONTRIBUTE file for contribution guidelines.
 
 ### Differences to Slogger
 

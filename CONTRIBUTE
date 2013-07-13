@@ -1,0 +1,13 @@
+# Contribution Guidelines
+
+- All code should be as close to PEP8 compliant as reasonably possible.
+- Try running pylint on your changes and minimize the errors/warnings.  Ideally
+  all code should be rated at least 7.0 by pylint.
+- Submit patches, etc. via a pull request
+
+## Adding new services
+
+To add a new supported service:
+    - Add the service name to AVAILABLE_SERVICES in
+      dayonetools/services/__init__.py
+    - Add new script in dayonetools/services/
