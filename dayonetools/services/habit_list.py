@@ -88,7 +88,7 @@ def _parse_args():
 
     parser.add_argument('-f', '--file', action='store',
                         dest='input_file', required=True,
-                        help='CSV file to import from')
+                        help='JSON file to import from')
 
     parser.add_argument('-v', '--verbose', default=False, action='store_true',
                         dest='verbose', required=False,
