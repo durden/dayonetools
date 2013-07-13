@@ -1,7 +1,7 @@
 # Day One tools
 
 This is a collection of scripts to collect data from various sources and store
-it into the (Day One)[http://dayoneapp.com/] journaling application.  Day One
+it into the [Day One](http://dayoneapp.com/) journaling application.  Day One
 is a fantastic application so I'd like to put as much of the data about my
 habits, Internet usage, goals, etc. into it as possible.  Luckily, the format
 for Day One is simply XML in the form of OS X plists.  This makes it very easy
