@@ -13,7 +13,9 @@ list.  This can be done by the following:
         - You can choose to optionally remove the first few lines of the e-mail
           that are not JSON data, everything up to the first '[' character.
         - Again, this is optional because this module will attempt to ignore
-          any non-JSON data.
+          any non-JSON data at the START of a file.
+        - Remember to remove the 'sent from iPhone' line at the end of your
+          e-mail.  This will cause the script to NOT process the JSON data.
 
 At this point, you are ready to do the actual conversion from JSON to Day One
 entires.  So, you should check all the 'settings' in this module for things you
