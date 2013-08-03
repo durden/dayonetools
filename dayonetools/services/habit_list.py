@@ -99,6 +99,24 @@ def _parse_args():
                         help=('Test import by creating Day one files in local '
                              'directory for inspect'))
 
+    def _datetime(str_):
+        """Convert date string in YYYY-MM-DD format to datetime object"""
+
+        if not str_:
+            return None
+
+        try:
+            date = datetime.strptime(str_, '%Y-%m-%d')
+        except ValueError:
+            msg = 'Invalid date format, should be YYYY-MM-DD'
+            raise argparse.ArgumentTypeError(msg)
+
+        return date
+
+    parser.add_argument('-s', '--since', type=_datetime,
+                        help=('Only process entries starting with YYYY-MM-DD '
+                              'and newer'))
+
     return vars(parser.parse_args())
 
 
@@ -141,11 +159,8 @@ def _create_habitlist_entry(directory, date, habits, verbose):
 
 
 def main():
-
-    # FIXME: Arguments needed:
-    #   - Process entries only newer than given yyyy-mm-dd
-
     args = _parse_args()
+    user_specified_date = args['since']
 
     if args['test']:
         directory = './test'
@@ -170,10 +185,13 @@ def main():
     habits = collections.defaultdict(list)
     for habit in json.loads(_json):
         name = habit['name']
-
         for dt in habit['completed']:
             date = strip_date_from_time(dt)
-            habits[date].append(name)
+            curr_dtime_obj = datetime.strptime(date, '%Y-%m-%d')
+
+            if user_specified_date is None or (
+                                    curr_dtime_obj >= user_specified_date):
+                habits[date].append(name)
 
     for date, habits in habits.iteritems():
         _create_habitlist_entry(directory, date, habits, args['verbose'])
