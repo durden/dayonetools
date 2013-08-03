@@ -87,6 +87,23 @@ def _parse_args():
                         dest='verbose', required=False,
                         help='Verbose debugging information')
 
+    def _datetime(str_):
+        """Convert date string in YYYY-MM-DD format to datetime object"""
+
+        if not str_:
+            return None
+
+        try:
+            date = datetime.strptime(str_, '%Y-%m-%d')
+        except ValueError:
+            msg = 'Invalid date format, should be YYYY-MM-DD'
+            raise argparse.ArgumentTypeError(msg)
+
+        return date
+
+    parser.add_argument('-s', '--since', type=_datetime,
+                        help=('Only process entries starting with YYYY-MM-DD '
+                              'and newer'))
     parser.add_argument('-t', '--test', default=False, action='store_true',
                         dest='test', required=False,
                         help=('Test import by creating Day one files in local '
@@ -134,10 +151,8 @@ def _sanitize_entry_text(entry_lines, strip_quotes):
 
 
 def main():
-    # FIXME: Arguments needed:
-    #   - Process entries only newer than given yyyy-mm-dd
-
     args = _parse_args()
+    user_specified_date = args['since']
 
     date_re = re.compile('^\d{4}-\d{2}-\d{2}$')
 
@@ -172,6 +187,13 @@ def main():
 
             if curr_date is None:
                 curr_date = new_date
+
+            # iDoneThis orders file export in decreasing dates so when we find
+            # an entry that occured BEFORE date user asked for we are done.
+            if user_specified_date is not None:
+                curr_dtime_obj = datetime.strptime(curr_date, '%Y-%m-%d')
+                if curr_dtime_obj < user_specified_date:
+                    return
 
             if curr_date == new_date:
                 current_day_entries.append(entry_text)
