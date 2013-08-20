@@ -130,7 +130,7 @@ def _habits_to_markdown(habits):
     markdown = ''
 
     for habit in habits:
-        markdown += '-%s\n' % (habit)
+        markdown += '- %s\n' % (habit)
 
     return markdown
 
