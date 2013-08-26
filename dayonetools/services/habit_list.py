@@ -23,6 +23,16 @@ would like to change:
     - HEADER_FOR_DAY_ONE_ENTRIES
     - DAYONE_ENTRIES
     - ENTRY_TEMPLATE
+    - TIMEZONE
+        - Make sure to choose the timezone of your iPhone because the Habit
+          List app stores all timezones in UTC and you'll want to convert this
+          to the timezone your iPhone used at the time you completed the habit.
+          This will ensure your Day One entries match the time you completed
+          the task and also prevent a habit from showing up more than once per
+          day which can happen with UTC time if you complete a habit late in
+          one day and early in the next, etc.
+        - You can find a list of available timezone strings here:
+            - http://en.wikipedia.org/wiki/List_of_tz_database_time_zones
 
 Next, you can run this module with your exported JSON data as an argument like
 so:
@@ -44,6 +54,8 @@ import json
 import os
 import re
 import uuid
+
+from dateutil import tz
 
 from dayonetools.services import convert_to_dayone_date_string
 
@@ -80,6 +92,8 @@ ENTRY_TEMPLATE = """
 </dict>
 </plist>
 """
+
+TIMEZONE = 'America/Chicago'
 
 
 def _parse_args():
@@ -120,6 +134,24 @@ def _parse_args():
                               'and newer'))
 
     return vars(parser.parse_args())
+
+
+def _user_time_zone_date(dt, user_time_zone, utc_time_zone):
+    """
+    Convert given datetime string into a yyyy-mm-dd string taking into
+    account the user time zone
+    """
+
+    # We know habit list stores in UTC so don't need the timezone info
+    dt = dt.split('+')[0].strip()
+    dtime_obj = datetime.strptime(dt, '%Y-%m-%d %H:%M:%S')
+
+    # Tell native datetime object we are using UTC, then we need to convert
+    # that UTC time into the user's timezone BEFORE stripping off the time
+    # to make sure the year, month, and date take into account timezone
+    # differences.
+    utc = dtime_obj.replace(tzinfo=utc_time_zone)
+    return utc.astimezone(user_time_zone)
 
 
 def _habits_to_markdown(habits):
@@ -164,6 +196,14 @@ def main():
     args = _parse_args()
     user_specified_date = args['since']
 
+    try:
+        iphone_time_zone = tz.gettz(TIMEZONE)
+    except Exception as err:
+        print 'Failed getting timezone, check your TIMEZONE variable'
+        raise
+
+    utc_time_zone = tz.gettz('UTC')
+
     if args['test']:
         directory = './test'
         try:
@@ -181,19 +221,20 @@ def main():
         # FIXME: For my sample this is about 27kb of memory
         _json = file_obj.read()
 
-    strip_date_from_time = lambda _date: _date.split()[0]
-
-    # FIXME: This is 48KB in memory..
-    habits = collections.defaultdict(list)
+    # Use a set b/c we can only do each habit once a day
+    habits = collections.defaultdict(set)
     for habit in json.loads(_json):
         name = habit['name']
         for dt in habit['completed']:
-            date = strip_date_from_time(dt)
-            curr_dtime_obj = datetime.strptime(date, '%Y-%m-%d')
+            dt_obj = _user_time_zone_date(dt, iphone_time_zone, utc_time_zone)
+            if user_specified_date is None or dt_obj >= user_specified_date:
 
-            if user_specified_date is None or (
-                                    curr_dtime_obj >= user_specified_date):
-                habits[date].append(name)
+                # Habits can only happen once a day so strip off time, just
+                # needed it datetime object for comparison
+                date = dt_obj.strftime('%Y-%m-%d')
+                habits[date].add(name)
+
+    # FIXME: habits dict is is 48KB in memory..
 
     for date, habits in habits.iteritems():
         _create_habitlist_entry(directory, date, habits, args['verbose'])
