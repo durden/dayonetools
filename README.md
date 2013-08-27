@@ -44,7 +44,7 @@ all the individual services, etc.
 
 See CONTRIBUTE file for contribution guidelines.
 
-### Differences to Slogger
+### Differences from Slogger
 
 This set of tools is very similar to the popular
 [slogger](https://github.com/ttscoff/Slogger).  However, it differs in a few
