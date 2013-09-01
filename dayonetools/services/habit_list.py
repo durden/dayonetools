@@ -127,13 +127,23 @@ def _parse_args():
             msg = 'Invalid date format, should be YYYY-MM-DD'
             raise argparse.ArgumentTypeError(msg)
 
-        return date
+        return date.replace(tzinfo=_user_time_zone())
 
     parser.add_argument('-s', '--since', type=_datetime,
                         help=('Only process entries starting with YYYY-MM-DD '
                               'and newer'))
 
     return vars(parser.parse_args())
+
+
+def _user_time_zone():
+    """Get default timezone for user"""
+
+    try:
+        return tz.gettz(TIMEZONE)
+    except Exception as err:
+        print 'Failed getting timezone, check your TIMEZONE variable'
+        raise
 
 
 def _user_time_zone_date(dt, user_time_zone, utc_time_zone):
@@ -196,11 +206,7 @@ def main():
     args = _parse_args()
     user_specified_date = args['since']
 
-    try:
-        iphone_time_zone = tz.gettz(TIMEZONE)
-    except Exception as err:
-        print 'Failed getting timezone, check your TIMEZONE variable'
-        raise
+    iphone_time_zone = _user_time_zone()
 
     utc_time_zone = tz.gettz('UTC')
 
