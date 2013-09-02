@@ -150,24 +150,22 @@ def _sanitize_entry_text(entry_lines, strip_quotes):
     return entry_text
 
 
-def main():
-    args = _parse_args()
-    user_specified_date = args['since']
+def read_entries_by_day(filename, start_date=None):
+    """
+    Parse given CSV file of idonethis entries and yield tuple containting the
+    following:
+        (date, list of entries for day)
 
-    date_re = re.compile('^\d{4}-\d{2}-\d{2}$')
+    date will be string in format: YYYY-MM-DD
 
-    if args['test']:
-        directory = './test'
-        try:
-            os.mkdir(directory)
-        except OSError as err:
-            print 'Warning: %s' % (err)
-    else:
-        directory = DAYONE_ENTRIES
+    if start_date is provided as a datetime object then only days starting on
+    or after the start_date will be returned.
+    """
 
-    with open(args['input_file'], 'r') as file_obj:
+    with open(filename, 'r') as file_obj:
         current_day_entries = []
         curr_date = None
+        date_re = re.compile('^\d{4}-\d{2}-\d{2}$')
 
         for row in csv.reader(file_obj):
             # If line doesn't start with a date assume it's just another line
@@ -190,18 +188,34 @@ def main():
 
             # iDoneThis orders file export in decreasing dates so when we find
             # an entry that occured BEFORE date user asked for we are done.
-            if user_specified_date is not None:
+            if start_date is not None:
                 curr_dtime_obj = datetime.strptime(curr_date, '%Y-%m-%d')
-                if curr_dtime_obj < user_specified_date:
+                if curr_dtime_obj < start_date:
                     return
 
             if curr_date == new_date:
                 current_day_entries.append(entry_text)
             else:
-                _create_dayone_entry(curr_date, current_day_entries,
-                                     directory, args['verbose'])
+                yield (curr_date, current_day_entries)
                 current_day_entries = [entry_text]
                 curr_date = new_date
+
+
+def main():
+    args = _parse_args()
+
+    if args['test']:
+        directory = './test'
+        try:
+            os.mkdir(directory)
+        except OSError as err:
+            print 'Warning: %s' % (err)
+    else:
+        directory = DAYONE_ENTRIES
+
+    for curr_date, entries in read_entries_by_day(args['input_file'],
+                                                  args['since']):
+        _create_dayone_entry(curr_date, entries, directory, args['verbose'])
 
 
 if __name__ == '__main__':
