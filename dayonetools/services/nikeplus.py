@@ -9,6 +9,7 @@ The result will be a new Day One entry for each line in the CSV file.
 
 import argparse
 import collections
+from datetime import datetime
 import csv
 import os
 import re
@@ -70,7 +71,25 @@ def _parse_args():
     parser.add_argument('-t', '--test', default=False, action='store_true',
                         dest='test', required=False,
                         help=('Test import by creating Day one files in local '
-                             'directory for inspect'))
+                              'directory for inspect'))
+
+    def _datetime(str_):
+        """Convert date string in YYYY-MM-DD format to datetime object"""
+
+        if not str_:
+            return None
+
+        try:
+            date = datetime.strptime(str_, '%Y-%m-%d')
+        except ValueError:
+            msg = 'Invalid date format, should be YYYY-MM-DD'
+            raise argparse.ArgumentTypeError(msg)
+
+        return date
+
+    parser.add_argument('-s', '--since', type=_datetime,
+                        help=('Only process entries starting with YYYY-MM-DD '
+                              'and newer'))
 
     return vars(parser.parse_args())
 
@@ -102,22 +121,15 @@ def _create_nikeplus_entry(activity, directory, verbose):
         print 'Created entry for %s: %s' % (activity.start_time, file_name)
 
 
-def main():
-    # FIXME: Arguments needed:
-    #   - Process entries only newer than given yyyy-mm-dd
+def read_entries(filename, start_date=None):
+    """
+    Read and yield namedtuple for entries from filename
 
-    args = _parse_args()
+    if start_date is given as a datetime object only entries that happened on
+    or after that date will be returned.
+    """
 
-    if args['test']:
-        directory = './test'
-        try:
-            os.mkdir(directory)
-        except OSError as err:
-            print 'Warning: %s' % (err)
-    else:
-        directory = DAYONE_ENTRIES
-
-    with open(args['input_file'], 'r') as file_obj:
+    with open(filename, 'r') as file_obj:
         csv_reader = csv.reader(file_obj)
         header = csv_reader.next()
 
@@ -129,7 +141,30 @@ def main():
             # names in the code itself.  We are heavily dependent on the names
             # in the entry template matching the header line though.
             entry = activity(*row)
-            _create_nikeplus_entry(entry, directory, args['verbose'])
+
+            # Date information in nikeplus is separated from time information
+            # with a 'T'
+            date = entry.start_time.split('T')[0].strip()
+            entry_date = datetime.strptime(date, '%Y-%m-%d')
+
+            if entry_date >= start_date:
+                yield entry
+
+
+def main():
+    args = _parse_args()
+
+    if args['test']:
+        directory = './test'
+        try:
+            os.mkdir(directory)
+        except OSError as err:
+            print 'Warning: %s' % (err)
+    else:
+        directory = DAYONE_ENTRIES
+
+    for entry in read_entries(args['input_file'], args['since']):
+        _create_nikeplus_entry(entry, directory, args['verbose'])
 
 
 if __name__ == '__main__':
