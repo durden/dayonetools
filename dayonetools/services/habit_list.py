@@ -177,7 +177,7 @@ def _habits_to_markdown(habits):
     return markdown
 
 
-def _create_habitlist_entry(directory, date, habits, verbose):
+def create_habitlist_entry(directory, date, habits, verbose):
     """Create day one file entry for given habits, date pair"""
 
     # Create unique uuid without any specific machine information
@@ -202,13 +202,51 @@ def _create_habitlist_entry(directory, date, habits, verbose):
         print 'Created entry for %s: %s' % (date, file_name)
 
 
-def main():
-    args = _parse_args()
-    user_specified_date = args['since']
+def parse_habits_file(filename, start_date=None):
+    """
+    Parse habits json file and return dict of data organized by date
+
+    start_date can be a datetime object used only to return habits that were
+    started on or after start_date
+    """
+
+    with open(filename, 'r') as file_obj:
+        junk = file_obj.readline()
+        junk = file_obj.readline()
+        junk = file_obj.readline()
+
+        # FIXME: For my sample this is about 27kb of memory
+        _json = file_obj.read()
 
     iphone_time_zone = _user_time_zone()
-
     utc_time_zone = tz.gettz('UTC')
+
+    # Use a set b/c we can only do each habit once a day
+    habits = collections.defaultdict(set)
+
+    # FIXME: Maybe optimize this to not hold it all in memory
+
+    # We have to parse all json and return it b/c the data is organized by
+    # habit and we need it organized by date. So, we can't use a generator or
+    # anything to yield values as they come b/c we won't know if we've parsed
+    # the entire day until all JSON is parsed.
+
+    for habit in json.loads(_json):
+        name = habit['name']
+
+        for dt in habit['completed']:
+            dt_obj = _user_time_zone_date(dt, iphone_time_zone, utc_time_zone)
+            if start_date is None or dt_obj >= start_date:
+                # Habits can only happen once a day so strip off time, just
+                # needed it datetime object for comparison
+                date = dt_obj.strftime('%Y-%m-%d')
+                habits[date].add(name)
+
+    return habits
+
+
+def main():
+    args = _parse_args()
 
     if args['test']:
         directory = './test'
@@ -219,44 +257,10 @@ def main():
     else:
         directory = DAYONE_ENTRIES
 
-    with open(args['input_file'], 'r') as file_obj:
-        junk = file_obj.readline()
-        junk = file_obj.readline()
-        junk = file_obj.readline()
-
-        # FIXME: For my sample this is about 27kb of memory
-        _json = file_obj.read()
-
-    # Use a set b/c we can only do each habit once a day
-    habits = collections.defaultdict(set)
-    for habit in json.loads(_json):
-        name = habit['name']
-        for dt in habit['completed']:
-            dt_obj = _user_time_zone_date(dt, iphone_time_zone, utc_time_zone)
-            if user_specified_date is None or dt_obj >= user_specified_date:
-
-                # Habits can only happen once a day so strip off time, just
-                # needed it datetime object for comparison
-                date = dt_obj.strftime('%Y-%m-%d')
-                habits[date].add(name)
-
-    # FIXME: habits dict is is 48KB in memory..
+    habits = parse_habits_file(args['input_file'], args['since'])
 
     for date, habits in habits.iteritems():
-        _create_habitlist_entry(directory, date, habits, args['verbose'])
-
-        # Dict: habits[yyyy-mm-dd] = ['run', 'lift weights', ...]
-        # Read JSON into memory
-        # Go through each habit
-        #   Go thru each date in 'completed'
-        #   Strip off time, just get yyyy-mm-dd
-        #   Insert date into dict if needed
-        #   Append to date's list with this habits name
-        # Go thru all dates (keys of dict)
-        # Create entry for each date with a list of the habits for that day
-        #   - Run
-        #   - Lift weights
-        #   Append to dict
+        create_habitlist_entry(directory, date, habits, args['verbose'])
 
 
 if __name__ == '__main__':
