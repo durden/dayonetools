@@ -147,7 +147,7 @@ def read_entries(filename, start_date=None):
             date = entry.start_time.split('T')[0].strip()
             entry_date = datetime.strptime(date, '%Y-%m-%d')
 
-            if entry_date >= start_date:
+            if start_date is None or entry_date >= start_date:
                 yield entry
 
 
