@@ -10,6 +10,8 @@ list.  This can be done by the following:
     - Choose the 'Export Data' option
     - E-mail the data to yourself
     - Copy and paste the e-mail contents into a file of your choosing
+        - DO NOT REMOVE THE EXTRA THREE LINES OF THE E-MAIL. WE CURRENTLY HAVE
+          A BUG THAT EXPECTS THESE THREE LINES
         - You can choose to optionally remove the first few lines of the e-mail
           that are not JSON data, everything up to the first '[' character.
         - Again, this is optional because this module will attempt to ignore
@@ -211,6 +213,8 @@ def parse_habits_file(filename, start_date=None):
     """
 
     with open(filename, 'r') as file_obj:
+        # FIXME: This expects 3 lines of junk at the beginning of the file, but
+        # we could just read until we find '[' and ignore up until that point.
         junk = file_obj.readline()
         junk = file_obj.readline()
         junk = file_obj.readline()
@@ -231,6 +235,8 @@ def parse_habits_file(filename, start_date=None):
     # anything to yield values as they come b/c we won't know if we've parsed
     # the entire day until all JSON is parsed.
 
+    # FIXME: Should have something to catch ValueError exceptions around this
+    # so we can show the line with the error if something is wrong.
     for habit in json.loads(_json):
         name = habit['name']
 
