@@ -191,7 +191,7 @@ def read_entries_by_day(filename, start_date=None):
             if start_date is not None:
                 curr_dtime_obj = datetime.strptime(curr_date, '%Y-%m-%d')
                 if curr_dtime_obj < start_date:
-                    return
+                    raise StopIteration
 
             if curr_date == new_date:
                 current_day_entries.append(entry_text)
@@ -199,6 +199,10 @@ def read_entries_by_day(filename, start_date=None):
                 yield (curr_date, current_day_entries)
                 current_day_entries = [entry_text]
                 curr_date = new_date
+
+        # Get last day if there was anything left over
+        if current_day_entries:
+            yield (curr_date, current_day_entries)
 
 
 def main():
