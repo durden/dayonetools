@@ -219,6 +219,8 @@ def main():
 
     for curr_date, entries in read_entries_by_day(args['input_file'],
                                                   args['since']):
+        entries = reversed(entries)
+
         _create_dayone_entry(curr_date, entries, directory, args['verbose'])
 
 
