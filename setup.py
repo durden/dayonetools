@@ -1,8 +1,6 @@
 from setuptools import setup
 import io
 
-import dayonetools
-
 # Take from Jeff Knupp's excellent article:
 # http://www.jeffknupp.com/blog/2013/08/16/open-sourcing-a-python-project-the-right-way/
 
@@ -19,7 +17,7 @@ def read(*filenames, **kwargs):
 
 
 setup(name='dayonetools',
-      version='0.5.0',
+      version='0.6.0',
       description='Tools to import multiple services into Day One Journal',
       long_description=read('README.md'),
       package_data={'': ['README.md']},
