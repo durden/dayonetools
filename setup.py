@@ -28,6 +28,7 @@ setup(name='dayonetools',
       author_email='durdenmisc@gmail.com',
       url='https://github.com/durden/dayonetools',
       packages=['dayonetools', 'dayonetools.services'],
+      install_requires=['python-dateutil>=2.2'],
       platforms='any',
       classifiers= [
         'Development Status :: 4 - Beta',
