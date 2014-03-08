@@ -1,5 +1,4 @@
 from setuptools import setup
-
 import io
 
 import dayonetools
@@ -18,14 +17,16 @@ def read(*filenames, **kwargs):
 
     return sep.join(buf)
 
-long_description = read('README.md')
 
 setup(name='dayonetools',
-      version='0.2.0',
+      version='0.3.0',
       description='Tools to import multiple services into Day One Journal',
+      long_description=read('README.md'),
+      package_data={'': ['README.md']},
+      license='MIT',
       author='Luke Lee',
       author_email='durdenmisc@gmail.com',
-      url='http://www.lukelee.me',
+      url='https://github.com/durden/dayonetools'
       packages=['dayonetools', 'dayonetools.services'],
       platforms='any',
       classifiers= [
