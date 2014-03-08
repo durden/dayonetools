@@ -179,30 +179,6 @@ def _habits_to_markdown(habits):
     return markdown
 
 
-def _format_dayone_date_string(day_str):
-    """
-    Format year, month, day into iso formatted string suitable for day one
-    """
-
-    year, month, day = day_str.split('-')
-
-    now = datetime.utcnow()
-
-    # Don't know the hour, minute, etc. so just assume midnight
-    date = now.replace(year=int(year),
-                       month=int(month),
-                       day=int(day),
-                       minute=0,
-                       hour=0,
-                       second=0,
-                       microsecond=0)
-
-    iso_string = date.isoformat()
-
-    # Very specific format for dayone, if the 'Z' is not in the
-    # correct positions the entries will not show up in dayone at all.
-    return iso_string + 'Z'
-
 
 def create_habitlist_entry(directory, day_str, habits, verbose):
     """Create day one file entry for given habits, date pair"""
@@ -215,7 +191,7 @@ def create_habitlist_entry(directory, day_str, habits, verbose):
     file_name = '%s.doentry' % (uuid_str)
     full_file_name = os.path.join(directory, file_name)
 
-    date = _format_dayone_date_string(day_str)
+    convert_to_dayone_date_string(date)
     habits = _habits_to_markdown(habits)
 
     entry = {'entry_title': HEADER_FOR_DAYONE_ENTRIES,

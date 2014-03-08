@@ -13,27 +13,28 @@ def get_service_module(service_name):
     return importlib.import_module(module)
 
 
-def convert_to_dayone_date_string(date):
+def convert_to_dayone_date_string(day_str):
     """
     Convert given date in 'yyyy-mm-dd' format into dayone accepted format of
     iso8601
 
-    The timestamp will match the current time but year, month, and day will
-    be replaced with given arguments.
+    The timestamp will match midnight but year, month, and day will be replaced
+    with given arguments.
     """
 
-    year, month, day = date.split('-')
+    year, month, day = day_str.split('-')
 
     from datetime import datetime
     now = datetime.utcnow()
 
-    # Dayone doesn't read entries correctly when date has a ms component
-    ms = 0
-
+    # Don't know the hour, minute, etc. so just assume midnight
     date = now.replace(year=int(year),
                        month=int(month),
                        day=int(day),
-                       microsecond=ms)
+                       minute=0,
+                       hour=0,
+                       second=0,
+                       microsecond=0)
 
     iso_string = date.isoformat()
 
