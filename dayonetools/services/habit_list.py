@@ -173,13 +173,38 @@ def _habits_to_markdown(habits):
     # we want to add a chacter to the beginning and end of each string in list.
     markdown = ''
 
-    for habit in habits:
-        markdown += '- %s\n' % (habit)
+    for habit, dt_obj in habits:
+        markdown += '- [%02d:%02d] %s\n' % (dt_obj.hour, dt_obj.minute, habit)
 
     return markdown
 
 
-def create_habitlist_entry(directory, date, habits, verbose):
+def _format_dayone_date_string(day_str):
+    """
+    Format year, month, day into iso formatted string suitable for day one
+    """
+
+    year, month, day = day_str.split('-')
+
+    now = datetime.utcnow()
+
+    # Don't know the hour, minute, etc. so just assume midnight
+    date = now.replace(year=int(year),
+                       month=int(month),
+                       day=int(day),
+                       minute=0,
+                       hour=0,
+                       second=0,
+                       microsecond=0)
+
+    iso_string = date.isoformat()
+
+    # Very specific format for dayone, if the 'Z' is not in the
+    # correct positions the entries will not show up in dayone at all.
+    return iso_string + 'Z'
+
+
+def create_habitlist_entry(directory, day_str, habits, verbose):
     """Create day one file entry for given habits, date pair"""
 
     # Create unique uuid without any specific machine information
@@ -190,7 +215,7 @@ def create_habitlist_entry(directory, date, habits, verbose):
     file_name = '%s.doentry' % (uuid_str)
     full_file_name = os.path.join(directory, file_name)
 
-    date = convert_to_dayone_date_string(date)
+    date = _format_dayone_date_string(day_str)
     habits = _habits_to_markdown(habits)
 
     entry = {'entry_title': HEADER_FOR_DAYONE_ENTRIES,
@@ -206,7 +231,7 @@ def create_habitlist_entry(directory, date, habits, verbose):
 
 def parse_habits_file(filename, start_date=None):
     """
-    Parse habits json file and return dict of data organized by date
+    Parse habits json file and return dict of data organized by day
 
     start_date can be a datetime object used only to return habits that were
     started on or after start_date
@@ -243,10 +268,10 @@ def parse_habits_file(filename, start_date=None):
         for dt in habit['completed']:
             dt_obj = _user_time_zone_date(dt, iphone_time_zone, utc_time_zone)
             if start_date is None or dt_obj >= start_date:
-                # Habits can only happen once a day so strip off time, just
-                # needed it datetime object for comparison
-                date = dt_obj.strftime('%Y-%m-%d')
-                habits[date].add(name)
+                # Habits will be organized by day then each one will have it's
+                # own time.
+                day_str = dt_obj.strftime('%Y-%m-%d')
+                habits[day_str].add((name, dt_obj))
 
     return habits
 
@@ -265,8 +290,8 @@ def main():
 
     habits = parse_habits_file(args['input_file'], args['since'])
 
-    for date, habits in habits.iteritems():
-        create_habitlist_entry(directory, date, habits, args['verbose'])
+    for day_str, days_habits in habits.iteritems():
+        create_habitlist_entry(directory, day_str, days_habits, args['verbose'])
 
 
 if __name__ == '__main__':
