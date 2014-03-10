@@ -15,11 +15,14 @@ primarily support services without a web API and those that involve more manual
 setup to export data, etc.
 
 ## Install
+- User mode
+    - pip install dayonetools
 
-- Install package with the standard `pip` workflow:
-    - git clone repositiory
-    - cd into repository
-    - pip install .
+- Development mode
+    - Install package with the standard `pip` workflow:
+        - git clone repositiory
+        - cd into repository
+        - pip install .
 
 Now you should have a top-level script called `dayonetools` to interact with
 all the individual services, etc.
