@@ -27,12 +27,16 @@ def convert_to_dayone_date_string(day_str):
     from datetime import datetime
     now = datetime.utcnow()
 
+    # FIXME: The current version of day one does not support timezone data
+    # correctly.  So, if we enter midnight here then every entry is off by a
+    # day.
+
     # Don't know the hour, minute, etc. so just assume midnight
     date = now.replace(year=int(year),
                        month=int(month),
                        day=int(day),
-                       minute=0,
-                       hour=0,
+                       minute=00,
+                       hour=10,
                        second=0,
                        microsecond=0)
 
