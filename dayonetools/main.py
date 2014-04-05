@@ -9,7 +9,8 @@ def _show_help():
     """Print help"""
 
     _help = "{doc}\n\nUsage: {usage}\nSupported service arguments: {services}"
-    args = {'doc': __doc__, 'usage': '%s <service_name>' % (sys.argv[0]),
+    args = {'doc': __doc__,
+            'usage': '[--version] [%s <service_name>]' % (sys.argv[0]),
             'services': services.AVAILABLE_SERVICES}
 
     print _help.format(**args)
@@ -33,6 +34,11 @@ def _parse_args():
     except IndexError:
         _show_help()
         sys.exit(-1)
+
+    if args['service_name'] == '--version':
+        from dayonetools import __version__
+        print __version__
+        sys.exit(0)
 
     valid_service = args['service_name'] in services.AVAILABLE_SERVICES
 
