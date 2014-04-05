@@ -17,7 +17,7 @@ def read(*filenames, **kwargs):
 
 
 setup(name='dayonetools',
-      version='0.7.0',
+      version='1.0.0',
       description='Tools to import multiple services into Day One Journal',
       long_description=read('README.md'),
       package_data={'': ['README.md']},
