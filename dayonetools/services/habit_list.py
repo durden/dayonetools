@@ -152,6 +152,13 @@ def _user_time_zone_date(dt, user_time_zone, utc_time_zone):
     """
     Convert given datetime string into a yyyy-mm-dd string taking into
     account the user time zone
+
+    Keep in mind that this conversion might change the actual day if the
+    habit was entered 'early' or 'late' in the day.  This is correct because
+    the user entered the habit in their own timezone, but the app stores this
+    internally (and exports) in utc.  So, here we are effectively converting
+    the time back to when the user actually entered it, based on the timezone
+    the user claims they were in.
     """
 
     # We know habit list stores in UTC so don't need the timezone info
@@ -162,6 +169,7 @@ def _user_time_zone_date(dt, user_time_zone, utc_time_zone):
     # that UTC time into the user's timezone BEFORE stripping off the time
     # to make sure the year, month, and date take into account timezone
     # differences.
+
     utc = dtime_obj.replace(tzinfo=utc_time_zone)
     return utc.astimezone(user_time_zone)
 
@@ -191,7 +199,7 @@ def create_habitlist_entry(directory, day_str, habits, verbose):
     file_name = '%s.doentry' % (uuid_str)
     full_file_name = os.path.join(directory, file_name)
 
-    convert_to_dayone_date_string(date)
+    date = convert_to_dayone_date_string(day_str)
     habits = _habits_to_markdown(habits)
 
     entry = {'entry_title': HEADER_FOR_DAYONE_ENTRIES,
@@ -223,6 +231,9 @@ def parse_habits_file(filename, start_date=None):
         # FIXME: For my sample this is about 27kb of memory
         _json = file_obj.read()
 
+    # FIXME: Downside here is that we assume the user was in the same timezone
+    # for every habit.  However, it's possible that some of the habits were
+    # entered while the user was traveling in a different timezone, etc.
     iphone_time_zone = _user_time_zone()
     utc_time_zone = tz.gettz('UTC')
 
