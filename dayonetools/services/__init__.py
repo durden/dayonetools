@@ -1,6 +1,6 @@
 """Common services code"""
 
-AVAILABLE_SERVICES = ['habit_list', 'idonethis', 'nikeplus']
+AVAILABLE_SERVICES = ['habit_list', 'idonethis', 'nikeplus', 'pedometerpp']
 
 
 def get_service_module(service_name):
