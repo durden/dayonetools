@@ -81,7 +81,7 @@ def get_outfolder_names(service, outfolderseed, verbose=False):
             d1folder = candidate
         else:
             candidate = os.path.expanduser(
-                '~/Library/Mobile Documents/5U8NS4GX82~com~dayoneapp~dayone/Documents/Journal_dayone'
+                '~/Library/Mobile Documents/5U8NS4GX82~com~dayoneapp~dayone/Documents/Journal_dayone/entries'
             )
             if os.path.exists(candidate):
                 d1folder = candidate
