@@ -27,6 +27,8 @@ from dayonetools.services import *
 import sqlite3 as sqlite
 import datetime
 import pytz
+import plistlib
+import uuid
 
 SERVICENAME = 'pedometerpp'
 SERVICEVERSION = '1.0a1'
@@ -95,7 +97,7 @@ class PedometerPP():
         # Initialize our data collection
         self.entries = {}
 
-    def collectentries(self):
+    def collect_entries(self):
         """
         Load the database entries into a python dict
         Key is the UTC time of an entry
@@ -127,10 +129,90 @@ class PedometerPP():
                 'steps': row[3],
             }
 
+    def export_d1(self):
+        """
+        Loop through entries by date and count weekly and monthly sums
+        Write a plist for every entry into the output folder
+        """
+        sumweek = 0
+        summonth = 0
+
+        # FIXME: Make text localizable
+
+        def created1entry(edate, ekind, esteps, etext):
+            entry = {
+                'Creator': {
+                    'Software Agent': '{0} {1}'.format(SERVICEID, SERVICEVERSION),
+                    'Generation Date': datetime.datetime.utcnow(),
+                },
+                'UUID': str.upper(uuid.uuid4().hex),
+                'Creation Date': edate,
+                'Time Zone': self.args['timezone'],
+                'Tags': [SERVICENAME, 'M7Steps', '⚗Auto', ekind],
+                'Starred': False,
+                'Step Count': esteps,
+                'Entry Text': etext,
+            }
+            #plistlib.writePlist(entry, os.path.join(outfolder, entry['UUID']+'.doentry') )
+
+            # Day One names files with the uuid used in the file but other names seem to work as well
+            # So we use the date and the service name to create a name
+            # FIXME: Test for existing entry file
+            plistlib.writePlist(
+                entry,
+                os.path.join(self.d1folder, '{0}_{1}.doentry'.format(
+                    edate.strftime('%Y-%m-%dT%H-%M-%SZ'),
+                    SERVICENAME
+                ))
+            )
+
+        for i in sorted(self.entries):
+            #if i.date() > datetime.datetime(2014,01,01): continue
+            #if i.month != 4: continue
+
+            # Create entry for the last month on the first of the current month
+            if i.day == 1:
+                ii = i.replace(second=40) - datetime.timedelta(days=1)
+                print('{0} {1:10} {2:4} {3:10} ∑ {4}'.format(
+                    ii, 0,
+                    self.entries[i]['opt'],
+                    summonth,
+                    ii.strftime('%B %Y')
+                ))
+                created1entry(
+                    ii, '∑ Month', summonth,
+                    'Schritte im Monat {1}: {0}'.format(summonth, ii.strftime('%Y-%b'))
+                )
+                summonth = 0
+            summonth += self.entries[i]['steps']
+
+            # Create Entry for this Day
+            print('{0} {1:10} {2:4}'.format(i, self.entries[i]['steps'], self.entries[i]['opt']))
+            created1entry(
+                i, '∑ Day', self.entries[i]['steps'],
+                'Schritte heute: {0}'.format(self.entries[i]['steps'])
+            )
+
+            # We use ISO weeks, so we create a summary on Sunday
+            sumweek += self.entries[i]['steps']
+            (isoYear, isoWeek, isoWeekday) = i.isocalendar()
+            if isoWeekday == 7:  # sunday
+                ii = i.replace(second=20)
+                print('{0} {1:10} {2:4} {3:10} ∑ KW {4} {5}'.format(
+                    ii, 0,
+                    self.entries[i]['opt'],
+                    sumweek, isoWeek, isoYear))
+                created1entry(
+                    ii, '∑ Week', sumweek,
+                    'Schritte in Woche {1:02}-{2}: {0}'.format(sumweek, isoWeek, isoYear)
+                )
+                sumweek = 0
+
 
 def main():
     ppp = PedometerPP()
-    ppp.collectentries()
+    ppp.collect_entries()
+    ppp.export_d1()
 
 if __name__ == '__main__':
     main()
