@@ -6,3 +6,4 @@ VimballRecord
 tags
 *.netrwhist
 .idea/
+temp/
