@@ -42,6 +42,7 @@ all the individual services, etc.
 - [habit list](http://habitlist.com/)
 - [sleep cycle](http://sleepcycle.com/) (coming soon)
 - [Timing](http://timingapp.com/) (coming soon)
+- [Pedometer++](http://pedometerplusplus.com/)[itunes store](https://itunes.apple.com/de/artist/cross-forward-consulting-llc/id295660206?mt=8)
 
 ### How to contribute
 
