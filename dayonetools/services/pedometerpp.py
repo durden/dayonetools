@@ -16,6 +16,15 @@ allow you to inspect the conversion.  You can manually copy a few select
 entries into your Day One 'entries/' folder to ensure you approve of the
 formatting and can easily make any formatting adjustments.  Then, you can run
 this module again to fully import entries into Day One.
+
+Get help with:
+
+./dayonetools/main.py pedometerpp -h
+
+Example with a fictious device and output collected in test folder:
+
+./dayonetools/main.py pedometerpp -d 0123456789ABCDEFEDCBBCDEFEDCBA9876543210 -o test
+
 """
 from __future__ import unicode_literals
 
@@ -23,7 +32,8 @@ __author__ = 'jotefa'
 
 import argparse
 import shutil
-from dayonetools.services import *
+from dayonetools.services import get_outfolder_names
+import os
 import sqlite3 as sqlite
 import datetime
 import pytz
@@ -186,7 +196,7 @@ class PedometerPP():
                 summonth = 0
             summonth += self.entries[i]['steps']
 
-            # Create Entry for this Day
+            # Create entry for this Day
             print('{0} {1:10} {2:4}'.format(i, self.entries[i]['steps'], self.entries[i]['opt']))
             created1entry(
                 i, '∑ Day', self.entries[i]['steps'],
