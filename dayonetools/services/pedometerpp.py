@@ -41,7 +41,7 @@ import plistlib
 import uuid
 
 SERVICENAME = 'pedometerpp'
-SERVICEVERSION = '1.0a1'
+SERVICEVERSION = '1.0a2'
 SERVICEID = 'de.jotefa.d1tools.pedometerpp'
 
 
@@ -59,7 +59,8 @@ class PedometerPP():
         parser.add_argument(
             '-t', '--timezone', default='Europe/Berlin', action='store',
             dest='timezone', required=False,
-            help="The timezone of the pedometer (iPhone), default: 'Europe/Berlin'"
+            help="The English name of the timezone of the pedometer (iPhone),"
+                 " e.g. 'America/Chicago' or 'Africa/Johannesburg', default: 'Europe/Berlin'"
         )
         parser.add_argument(
             '-o', '--out', default='auto', action='store',
@@ -177,9 +178,6 @@ class PedometerPP():
             )
 
         for i in sorted(self.entries):
-            #if i.date() > datetime.datetime(2014,01,01): continue
-            #if i.month != 4: continue
-
             # Create entry for the last month on the first of the current month
             if i.day == 1:
                 ii = i.replace(second=40) - datetime.timedelta(days=1)
