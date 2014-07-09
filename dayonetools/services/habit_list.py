@@ -10,14 +10,14 @@ list.  This can be done by the following:
     - Choose the 'Export Data' option
     - E-mail the data to yourself
     - Copy and paste the e-mail contents into a file of your choosing
-        - DO NOT REMOVE THE EXTRA THREE LINES OF THE E-MAIL. WE CURRENTLY HAVE
-          A BUG THAT EXPECTS THESE THREE LINES
+        - Remove the 'sent from iPhone' line at the end of your e-mail.  This
+          will cause the script to NOT process the JSON data.
+        - DO NOT REMOVE THE LAST TWO EMPTY LINES OF THE E-MAIL. WE CURRENTLY
+          HAVE A BUG THAT EXPECTS THESE LINES.
         - You can choose to optionally remove the first few lines of the e-mail
           that are not JSON data, everything up to the first '[' character.
         - Again, this is optional because this module will attempt to ignore
           any non-JSON data at the START of a file.
-        - Remember to remove the 'sent from iPhone' line at the end of your
-          e-mail.  This will cause the script to NOT process the JSON data.
 
 At this point, you are ready to do the actual conversion from JSON to Day One
 entires.  So, you should check all the 'settings' in this module for things you
