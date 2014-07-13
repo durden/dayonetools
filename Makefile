@@ -14,5 +14,7 @@ install_test_dist:
 	pip install -i https://testpypi.python.org/pypi dayonetools
 
 test_install:
-	pip install dayonetools
 	dayonetools -h
+
+upload_release:
+	python setup.py sdist upload -r pypi
