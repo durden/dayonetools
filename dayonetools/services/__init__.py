@@ -4,7 +4,8 @@
 
 import os
 
-AVAILABLE_SERVICES = ['habit_list', 'idonethis', 'nikeplus', 'pedometerpp']
+AVAILABLE_SERVICES = ['habit_list', 'idonethis', 'nikeplus', 'pedometerpp',
+                      'sleep_cycle']
 
 
 def get_service_module(service_name):
@@ -17,13 +18,10 @@ def get_service_module(service_name):
     return importlib.import_module(module)
 
 
-def convert_to_dayone_date_string(day_str):
+def convert_to_dayone_date_string(day_str, hour=10, minute=0, second=0):
     """
     Convert given date in 'yyyy-mm-dd' format into dayone accepted format of
-    iso8601
-
-    The timestamp will match midnight but year, month, and day will be replaced
-    with given arguments.
+    iso8601 and adding additional hour, minutes, and seconds if given.
     """
 
     year, month, day = day_str.split('-')
@@ -39,9 +37,9 @@ def convert_to_dayone_date_string(day_str):
     date = now.replace(year=int(year),
                        month=int(month),
                        day=int(day),
-                       minute=00,
-                       hour=10,
-                       second=0,
+                       minute=int(minute),
+                       hour=int(hour),
+                       second=int(second),
                        microsecond=0)
 
     iso_string = date.isoformat()

@@ -40,7 +40,7 @@ all the individual services, etc.
 - [iDoneThis.com](http://idonethis.com)
 - [nike fuel](http://nikeplus.nike.com/)
 - [habit list](http://habitlist.com/)
-- [sleep cycle](http://sleepcycle.com/) (coming soon)
+- [sleep cycle](http://sleepcycle.com/)
 - [Timing](http://timingapp.com/) (coming soon)
 - [Pedometer++](http://pedometerplusplus.com/) ([itunes store](https://itunes.apple.com/de/artist/cross-forward-consulting-llc/id295660206?mt=8))
 
